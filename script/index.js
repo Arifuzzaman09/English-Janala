@@ -4,12 +4,25 @@ const load = () => {
         .then((data) => displayLesson(data.data))
 }
 
+
+const removeActive = (btn => {
+    const allBtn = document.querySelectorAll(".lesson-btn")
+    allBtn.forEach((btn) => btn.classList.remove('active'))
+    console.log(removeActive)
+})
 const loadWord = (id) => {
     const url = `https://openapi.programming-hero.com/api/level/${id}
 `
     fetch(url)
         .then((res) => res.json())
-        .then((data) => displayWord(data.data))
+        .then((data) => {
+            removeActive();
+            const clickBtn = document.getElementById(`lesson-btn-${id}`)
+            clickBtn.classList.add("active")
+
+
+            displayWord(data.data)
+        })
 }
 
 const displayWord = (words) => {
@@ -39,11 +52,11 @@ const displayWord = (words) => {
         const card = document.createElement('div')
         card.innerHTML = `
        <div class="bg-white py-10 px-5 text-center space-y-4 rounded-xl shadow-sm">
-            <h2 class="text-2xl font-bold ">${word.word?word.word:"শব্দ পাওয়া যায়নি"}</h2>
+            <h2 class="text-2xl font-bold ">${word.word ? word.word : "শব্দ পাওয়া যায়নি"}</h2>
             <p class="font-semibold">Meaning /Pronounciation</p>
-            <div class="font-bold text-2xl font-bangla">${word.meaning?word.meaning:"অথ পাওয়া যায় নি"} / ${word.pronunciation?word.pronunciation:"pronunciation পাওয়া যায় নি"}</div>
+            <div class="font-bold text-2xl font-bangla">${word.meaning ? word.meaning : "অথ পাওয়া যায় নি"} / ${word.pronunciation ? word.pronunciation : "pronunciation পাওয়া যায় নি"}</div>
             <div class="flex justify-between items-center">
-                <button class="btn bg-[#1a90ff2d] hover:bg-[#1a90ff9f] "><i
+                <button onclick="my_modal_5.showModal()" class="btn bg-[#1a90ff2d] hover:bg-[#1a90ff9f] "><i
                         class="fa-solid fa-circle-info"></i></button>
                 <button class="btn bg-[#1a90ff2d] hover:bg-[#1a90ff9f]"><i class="fa-solid fa-volume-high"></i></button>
 
@@ -63,7 +76,7 @@ const displayLesson = (lessons) => {
         const div = document.createElement('div')
 
         div.innerHTML = `
-           <button onclick="loadWord(${lesson.level_no})" class="btn btn-outline btn-primary">
+           <button id="lesson-btn-${lesson.level_no}" onclick="loadWord(${lesson.level_no})" class="btn btn-outline btn-primary lesson-btn">
            <i class="fa-solid fa-book-open"></i> Lesson-${lesson.level_no}</button>
         `;
         levelContainer.append(div)
