@@ -1,9 +1,24 @@
-const createElement = (arr)=>{
-    const htmlElement = arr.map((elem)=>`<span class="btn">${elem}</span>`);
+const createElement = (arr) => {
+    const htmlElement = arr.map((elem) => `<span class="btn">${elem}</span>`);
     return htmlElement.join(" ")
 }
 
+function pronounceWord(word) {
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = "en-EN"; // English
+  window.speechSynthesis.speak(utterance);
+}
 
+const manageLoading = (status) => {
+    if (status === true) {
+        document.getElementById("loading").classList.remove("hidden")
+        document.getElementById("word-container").classList.add("hidden")
+    } else {
+        document.getElementById("word-container").classList.remove("hidden")
+        document.getElementById("loading").classList.add("hidden")
+    }
+
+}
 
 const load = () => {
     fetch("https://openapi.programming-hero.com/api/levels/all")
@@ -12,13 +27,14 @@ const load = () => {
 }
 
 
-const removeActive = (btn => {
+const removeActive = () => {
     const allBtn = document.querySelectorAll(".lesson-btn")
     allBtn.forEach((btn) => btn.classList.remove('active'))
 
-})
+}
 
 const loadWord = (id) => {
+    manageLoading(true)
     const url = `https://openapi.programming-hero.com/api/level/${id}`
     fetch(url)
         .then((res) => res.json())
@@ -97,6 +113,8 @@ const displayWord = (words) => {
         <h2 class="text-4xl font-bold">নেক্সট Lesson এ যান</h2>
       </div>
         `
+        manageLoading(false)
+        return;
     }
 
 
@@ -110,13 +128,14 @@ const displayWord = (words) => {
             <div class="flex justify-between items-center">
                 <button onclick="cardDetails(${word.id})" class="btn bg-[#1a90ff2d] hover:bg-[#1a90ff9f] "><i
                         class="fa-solid fa-circle-info"></i></button>
-                <button class="btn bg-[#1a90ff2d] hover:bg-[#1a90ff9f]"><i class="fa-solid fa-volume-high"></i></button>
+                <button onclick="pronounceWord('${word.word}')" class="btn bg-[#1a90ff2d] hover:bg-[#1a90ff9f]"><i class="fa-solid fa-volume-high"></i></button>
 
             </div>
         </div>
       `
         wordContainer.append(card)
     });
+    manageLoading(false)
 }
 
 const displayLesson = (lessons) => {
@@ -137,3 +156,18 @@ const displayLesson = (lessons) => {
     }
 }
 load()
+
+document.getElementById('btn-search').addEventListener('click', () => {
+    removeActive();
+    const input = document.getElementById('input-search')
+    const searchValue = input.value.trim().toLowerCase();
+    fetch("https://openapi.programming-hero.com/api/words/all")
+    .then((res)=>res.json())
+    .then(data=>{
+        const allWords = data.data;
+        const filterWords = allWords.filter((word)=>
+             word.word.toLowerCase().includes(searchValue))
+
+        displayWord(filterWords)
+    });
+});
