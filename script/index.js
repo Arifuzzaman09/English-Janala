@@ -1,3 +1,10 @@
+const createElement = (arr)=>{
+    const htmlElement = arr.map((elem)=>`<span class="btn">${elem}</span>`);
+    return htmlElement.join(" ")
+}
+
+
+
 const load = () => {
     fetch("https://openapi.programming-hero.com/api/levels/all")
         .then((res) => res.json())
@@ -8,11 +15,11 @@ const load = () => {
 const removeActive = (btn => {
     const allBtn = document.querySelectorAll(".lesson-btn")
     allBtn.forEach((btn) => btn.classList.remove('active'))
-    console.log(removeActive)
+
 })
+
 const loadWord = (id) => {
-    const url = `https://openapi.programming-hero.com/api/level/${id}
-`
+    const url = `https://openapi.programming-hero.com/api/level/${id}`
     fetch(url)
         .then((res) => res.json())
         .then((data) => {
@@ -24,6 +31,58 @@ const loadWord = (id) => {
             displayWord(data.data)
         })
 }
+
+const cardDetails = (id) => {
+    const url = `https://openapi.programming-hero.com/api/word/${id}`
+
+    fetch(url)
+        .then((res) => res.json())
+        .then((detail) => displayWordDetails(detail.data))
+}
+
+// "data": {
+// "word": "Eager",
+// "meaning": "আগ্রহী",
+// "pronunciation": "ইগার",
+// "level": 1,
+// "sentence": "The kids were eager to open their gifts.",
+// "points": 1,
+// "partsOfSpeech": "adjective",
+// "synonyms": [
+// "enthusiastic",
+// "excited",
+// "keen"
+// ],
+// "id": 5
+// }
+
+const displayWordDetails = (word) => {
+
+    const detailContainer = document.getElementById('detail-container')
+    detailContainer.innerHTML = `
+    
+     <div>
+        <h2 class="text-2xl font-bold">${word.word} (<i class="fa-solid fa-microphone-lines"></i> :${word.pronunciation})</h2>
+    </div>
+    <div>
+        <h2 class=" font-bold">meaning</h2>
+        <p>${word.meaning}</p>
+    </div>
+    <div>
+        <h2 class=" font-bold">Example</h2>
+        <p>${word.sentence}</p>
+    </div>
+    <div>
+        <h2 class=" font-bold">সমার্থক শব্দ গুলো</h2>
+        <div>${createElement(word.synonyms)} </div>
+    </div>
+    
+    
+    `
+    document.getElementById('word_modal').showModal();
+}
+
+
 
 const displayWord = (words) => {
 
@@ -40,13 +99,6 @@ const displayWord = (words) => {
         `
     }
 
-    //     {
-    // "id": 4,
-    // "level": 5,
-    // "word": "Diligent",
-    // "meaning": "পরিশ্রমী",
-    // "pronunciation": "ডিলিজেন্ট"
-    // }
 
     words.forEach(word => {
         const card = document.createElement('div')
@@ -56,7 +108,7 @@ const displayWord = (words) => {
             <p class="font-semibold">Meaning /Pronounciation</p>
             <div class="font-bold text-2xl font-bangla">${word.meaning ? word.meaning : "অথ পাওয়া যায় নি"} / ${word.pronunciation ? word.pronunciation : "pronunciation পাওয়া যায় নি"}</div>
             <div class="flex justify-between items-center">
-                <button onclick="my_modal_5.showModal()" class="btn bg-[#1a90ff2d] hover:bg-[#1a90ff9f] "><i
+                <button onclick="cardDetails(${word.id})" class="btn bg-[#1a90ff2d] hover:bg-[#1a90ff9f] "><i
                         class="fa-solid fa-circle-info"></i></button>
                 <button class="btn bg-[#1a90ff2d] hover:bg-[#1a90ff9f]"><i class="fa-solid fa-volume-high"></i></button>
 
